@@ -1,0 +1,89 @@
+---
+
+- url: "http://jira.domain"
+  user: "user.name"
+  password: "secret"
+
+  filters:
+    issue:
+      - key
+    fields:
+      - creator
+      - assignee
+      - aggregatetimespent
+      - status
+      - created
+      - updated
+      - timespent
+      - issuetype
+      - summary
+      - timeestimate
+    timetracking:
+      - timeSpentSeconds
+      - remainingEstimateSeconds
+    states:
+      - {open: "Offen"}
+      - {in_progress: "In Arbeit"}
+      - {done: "Erledigt"}
+      - {qa_staging: "QA (STAGING)"}
+      - {closed: "Geschlossen"}
+
+  tables:
+    times:
+        aggregatetimespent: 0
+        timeestimate: 0
+        timeSpentSeconds: 0
+        remainingEstimateSeconds: 0
+    tasks:
+        all: 0
+        open: 0
+        in_progress: 0
+        qa_staging: 0
+        unassignee: 0
+        done: 0
+        closed: 0
+    bugs:
+        all: 0
+        open: 0
+        in_progress: 0
+        qa_staging: 0
+        unassignee: 0
+        done: 0
+        closed: 0
+
+  jqls:
+    - name: "tickets for launch:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) ORDER BY updated DESC"
+      reports: [short, times, tasks]
+
+    - name: "bugs for launch:"
+      query: "project = SUPERPROJECT AND issuetype in ('Bug report', Problem) AND status not in (Resolved, Closed, Done) ORDER BY updated DESC"
+      reports: [short, times, tasks]
+
+    - name: "tickets without estimates:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND labels in (NoEstimate) ORDER BY updated DESC"
+      reports: [short]
+
+    - name: "tickets without specs:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND labels in (NoSpec) ORDER BY updated DESC"
+      reports: [short]
+
+    - name: "tickets without solution:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND labels in (NoSolution) ORDER BY updated DESC"
+      reports: [short]
+
+    - name: "tickets without tech. solution:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND labels in (NoTechSolution) ORDER BY updated DESC"
+      reports: [short]
+
+    - name: "tickets without assignee:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND assignee in (Sergej.Braznikov, lumas.entwickler, EMPTY) ORDER BY updated DESC"
+      reports: [short]
+
+    - name: "tickets with tech. risks (>= 2 PD):"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog) AND remainingEstimate > 2d ORDER BY updated DESC"
+      reports: [short, times]
+
+    - name: "tickets with tag Blocked:"
+      query: "project = SUPERPROJECT AND issuetype != Epos AND status not in (Resolved, Closed, Done) AND labels not in (PM, QA, Backlog, NoSpec, NoSolution, NoTechSolution) AND labels in (Blocked) ORDER BY updated DESC"
+      reports: [short]
