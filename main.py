@@ -150,4 +150,3 @@ if __name__ == "__main__":
     parser.add_argument("path", nargs="+", help="path to the config file")
     args = parser.parse_args()
     exec_jqls(get_config(args.path[0]))
-
