@@ -83,11 +83,14 @@ def print_report(jira_url, name, reports, query, tables, filters, data):
     def short_report(name, query, tickets):
         count = len(tickets)
         message = "%s %s" % (name, count)
-        if len(tickets) > 0:
+        count = len(tickets)
+        if count >= 5:
             print_fatal(message)
-            print_url(jira_url, query)
+        elif count > 0 and count < 5:
+            print_warning(message)
         else:
             print_info(message)
+        print_url(jira_url, query)
 
     def times_report(fields, tickets):
         for issue in tickets:
